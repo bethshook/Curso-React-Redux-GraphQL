@@ -1,5 +1,5 @@
 import {createStore, combineReducers, compose, applyMiddleware} from 'redux'
-import userReducer from './userDuck'
+import userReducer, {restoreSessionAction} from './userDuck'
 import charsReducer, {getCharactersAction} from './charsDuck'
 import thunk from 'redux-thunk'
 
@@ -22,6 +22,7 @@ export default function generateStore() {
   // we're calling the action creator which returns a func
   // then providing the args for that anon func
   getCharactersAction()(store.dispatch, store.getState)
+  restoreSessionAction()(store.dispatch)
   return store
 }
 // could add another func without composeEnhancers for prod

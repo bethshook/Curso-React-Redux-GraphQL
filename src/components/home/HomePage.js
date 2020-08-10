@@ -4,11 +4,11 @@ import styles from './home.module.css'
 // gives us dispatch and getState
 import { connect } from 'react-redux'
 // this is the remove char action, will be used as a prop
-import { removeCharacterAction } from "../../redux/charsDuck"
+import { removeCharacterAction, addToFavoritesAction } from "../../redux/charsDuck"
 
 // let URL = "https://rickandmortyapi.com/api"
 
-function Home({chars, removeCharacterAction }) {
+function Home({chars, removeCharacterAction, addToFavoritesAction }) {
 
     // let [chars, setChars] = useState([])
 
@@ -24,10 +24,14 @@ function Home({chars, removeCharacterAction }) {
     //     setChars([...chars])
     // }
 
+  function addFav() {
+    addToFavoritesAction()
+  }
+
     function renderCharacter() {
         let char = chars[0]
         return (
-            <Card leftClick={nextCharacter} {...char} />
+            <Card rightClick={addFav} leftClick={nextCharacter} {...char} />
         )
     }
 
@@ -63,4 +67,4 @@ function mapStateToProps(store){
 
 // connect with redux
 // second param is removeChar, within an object; it will be used in props
-export default connect(mapStateToProps, {removeCharacterAction})(Home)
+export default connect(mapStateToProps, {removeCharacterAction, addToFavoritesAction})(Home)

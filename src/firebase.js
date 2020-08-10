@@ -1,5 +1,6 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import 'firebase/firestore'
 
 var firebaseConfig = {
   apiKey: "AIzaSyBSzS8p_N9YyX7vX1DSLe1pXVkY6ME8S-c",
@@ -12,6 +13,19 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+
+let db = firebase.firestore().collection('favs')
+
+export function updateDB(array, uid) {
+  db.doc(uid).set({array}) // save data in diff docs that correspond to user
+}
+
+export function getFavs(uid){
+  return db.doc(uid).get()
+    .then(snap => {
+      return snap.data().array
+    })
+}
 
 //services we'll pass to our reducer
 export function signOutGoogle(){

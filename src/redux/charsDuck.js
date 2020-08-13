@@ -1,5 +1,5 @@
-import axios from 'axios'
 import {updateDB, getFavs} from '../firebase'
+import ApolloClient, { gql } from 'apollo-boost'
 
 const favStorage = localStorage.getItem('favs')
 
@@ -10,7 +10,10 @@ let initialData = {
   current: {},
   favorites: favStorage.length > 0 ? JSON.parse(favStorage) : []
 }
-let URL = 'https://rickandmortyapi.com/api/character'
+
+let client = new ApolloClient({
+  uri: "https://rickandmortyapi.com/graphql"
+})
 
 // reps the action that you're requesting
 // need error/success variants when communicating with backend
@@ -102,24 +105,35 @@ export let removeCharacterAction = () => (dispatch, getState) => {
 }
 
 export let getCharactersAction = () => (dispatch, getState) => {
+  let query = gql`
+  {
+    characters{
+      results{
+        name
+        image
+      }
+    }
+  }
+  `
   dispatch({
     type: GET_CHARACTERS
   })
-  // axios over fetch because we can receive an error directly
-  return axios.get(URL)
-    .then(res => {
-      // when we have results, we DISPATCH the action
-      // payload is the (optional) data
-      // action creator sends the payload to the reducer
-      // reducer will return them within the 'array' key
+  // sub axios with graphql
+  return client.query({
+    query
+  })
+    .then(({data, error}) => {
+      if (error) {
+        dispatch({
+          type: GET_CHARACTERS_ERROR,
+          payload: error
+        })
+        return;
+      }
       dispatch({
         type: GET_CHARACTERS_SUCCESS,
-        payload: res.data.results
-      })
-    }).catch(err => {
-      dispatch({
-        type: GET_CHARACTERS_ERROR,
-        payload: err.response.message
+        payload: data.characters.results,
       })
     })
+  // axios over fetch because we can receive an error directly
 }
